@@ -1,7 +1,12 @@
 // Este programa cambia el titulo de una vetana, solo funciona en un sistema operativo windows.
 
 #include <iostream>
-#include <windows.h>
+
+#ifdef _WIN32 
+    #include <windows.h>
+#else
+    #error Sistema no compatible
+#endif
 
 using namespace std;
 
