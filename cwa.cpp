@@ -1,5 +1,5 @@
 // Este programa sobreescribe una dirección memoria de un proceso de windows.
-// Utiliza game.cpp para probar el programa.
+// Compila game_example.cpp para probar el programa.
 
 #include <iostream>
 #include <windows.h>
