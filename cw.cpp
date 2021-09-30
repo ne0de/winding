@@ -1,7 +1,12 @@
 // Este programa cierra una ventana a partir de su titulo, solamente funciona en un sistema operativo windows.
 
 #include <stdio.h>
-#include <windows.h>
+
+#ifdef _WIN32 
+    #include <windows.h>
+#else
+    #error Sistema no compatible
+#endif
 
 int main(int argc, char *argv[])
 {
