@@ -5,10 +5,14 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    DArray arr;
-    arr.insert(10, true);
-    arr.insert(0, true);
-    arr.insert(1, true);
-    arr.insert(4, true);
+    DArray<int> arr;
+
+    arr.insert(10);
+    arr.insert(10);
+    arr.insert(1150);
+
+    for (size_t i = 0; i < arr.csize(); i++)
+        cout << arr[i] << " ";
+
     return 0;
 }
