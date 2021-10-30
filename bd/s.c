@@ -29,24 +29,33 @@ void handle_client(int client_socket)
     char buffer[RECEIVE_BUFFER_SIZE];
     char message[200];
     int receive_message_size;
-    // send(client_socket, message, strlen(message) + 1, 0);
 
-    while (strcmp(message, "QUIT") != 0)
+    if ((receive_message_size = recv(client_socket, buffer, RECEIVE_BUFFER_SIZE, 0)) < 0)
+        error("Error al recibir datos");
+
+    buffer[receive_message_size] = '\0';
+    printf("Datos recibidos: \n%s\n", buffer);
+
+    while (1)
     {
-        buffer[receive_message_size] = '\0';
-        printf("%s\n", buffer);
+        printf("> ");
         fgets(message, RECEIVE_BUFFER_SIZE, stdin);
         fflush(stdin);
-        printf("Sending: %s\n", message);
+
+        if (strcmp(message, "SALIR\n") == 0)
+            break;
+
         send(client_socket, message, strlen(message) + 1, 0);
-        *message = '\0';
+
         if ((receive_message_size = recv(client_socket, buffer, RECEIVE_BUFFER_SIZE, 0)) < 0)
-            error("Error on receive data.\n");
-        
+            error("Error al recibir datos");
+
+        buffer[receive_message_size] = '\0';
+        printf(">> %s\n", buffer);
     }
 
-    puts("Closing client socket..");
     closesocket(client_socket);
+    puts("Cliente desconectado correctamente.");
 }
 
 int main(int argc, char *argv[])
@@ -60,7 +69,7 @@ int main(int argc, char *argv[])
 
     if (argc != 3)
     {
-        printf("Usage: %s <server_ip> <server_port>\n", argv[0]);
+        printf("Uso: %s <server_ip> <server_port>\n", argv[0]);
         return 1;
     }
 
@@ -68,14 +77,14 @@ int main(int argc, char *argv[])
     port = atoi(argv[2]);
 
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-        error("Failed WSAStartup.\n");
+        error("Error al iniciar  WSAStartup");
 
-    printf("Winsock Initialised.\n");
+    printf("Iniciando socket..\n");
 
     if ((server_so = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-        error("Failed socket.\n");
+        error("Error al crear el socket");
 
-    printf("Socket created.\n");
+    printf("Socket creado correctamente.\n");
 
     memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
@@ -83,21 +92,21 @@ int main(int argc, char *argv[])
     server.sin_port = htons(port);
 
     if (bind(server_so, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR)
-        error("Bind failed.\n");
+        error("Error al enlazar el servidor");
 
     if (listen(server_so, MAX_PENDING) < 0)
-        error("Listen failed.\n");
+        error("Error al escuchar peticiones");
 
-    puts("Waiting for incoming connections..");
+    puts("Esperando conexiones entrantes..");
 
     while (1)
     {
         client_length = sizeof(client);
 
         if ((client_so = accept(server_so, (struct sockaddr *)&client, &client_length)) < 0)
-            error("Error on accept.\n");
+            error("Error al aceptar al cliente.\n");
 
-        printf("New connection accepted %s\n", inet_ntoa(client.sin_addr));
+        printf("Nueva conexion aceptada:  %s\n", inet_ntoa(client.sin_addr));
         handle_client(client_so);
     }
 
